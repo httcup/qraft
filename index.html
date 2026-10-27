@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>QRAFT · 参数化二维码生成器</title>
+    <meta
+      name="description"
+      content="参数化二维码生成器：八种骨架、四种定位点、渐变与内嵌标志，纯浏览器本地渲染，可导出 PNG / SVG。"
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:title" content="QRAFT · 参数化二维码生成器" />
+    <meta
+      property="og:description"
+      content="八种骨架、四种定位点、渐变与内嵌标志，本地渲染，导出 PNG / SVG。"
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <script>
+      (function () {
+        try {
+          var theme = JSON.parse(localStorage.getItem("qraft.theme") || '"light"');
+          var lang = JSON.parse(localStorage.getItem("qraft.lang") || '"zh"');
+          if (theme === "dark") document.documentElement.dataset.theme = "dark";
+          document.documentElement.dataset.lang = lang;
+          document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
