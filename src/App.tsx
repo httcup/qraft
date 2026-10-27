@@ -134,7 +134,7 @@ export default function App() {
       : store.get<Theme>("qraft.theme", "light"),
   );
   const [text, setText] = useState(() =>
-    params.get("text") ?? store.get<string>("qraft.text", "https://qrbtf.com"),
+    params.get("text") ?? store.get<string>("qraft.text", "https://xhxh.vip/"),
   );
   const [ecc, setEcc] = useState<Ecc>(() =>
     paramEcc && ECC_LEVELS.includes(paramEcc) ? paramEcc : store.get<Ecc>("qraft.ecc", "M"),
