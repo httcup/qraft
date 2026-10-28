@@ -14,6 +14,13 @@ import { dict, type Lang } from "./i18n";
 const ECC_LEVELS: Ecc[] = ["L", "M", "Q", "H"];
 const REPO_URL = "https://github.com/httcup/qraft";
 
+/** 二维码指向的地址：线上用当前页面地址，本地开发时指向正式站点。 */
+const SCAN_URL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(
+  typeof location === "undefined" ? "" : location.hostname,
+)
+  ? "https://qr.139t.cn"
+  : location.href.split("#")[0];
+
 type Theme = "light" | "dark";
 
 /** URL parameters let people share a design: ?text=…&style=dot&eye=circle&theme=dark */
@@ -107,6 +114,7 @@ const ICON = {
   github:
     "M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21",
   lock: "M5 11h14v10H5V11Zm3 0V7a4 4 0 0 1 8 0v4",
+  qr: "M4 4h6v6H4V4Zm1.5 1.5v3h3v-3h-3ZM14 4h6v6h-6V4Zm1.5 1.5v3h3v-3h-3ZM4 14h6v6H4v-6Zm1.5 1.5v3h3v-3h-3ZM14 14h2v2h-2v-2Zm4 0h2v2h-2v-2Zm-4 4h2v2h-2v-2Zm4 0h2v2h-2v-2Z",
 } as const;
 
 const Mark = () => (
@@ -148,6 +156,7 @@ export default function App() {
     };
   });
   const [exportSize, setExportSize] = useState(() => store.get<number>("qraft.size", 1024));
+  const [scanOpen, setScanOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
   const logoImage = useRef<HTMLImageElement | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
@@ -222,6 +231,42 @@ export default function App() {
   useEffect(() => store.set("qraft.ecc", ecc), [ecc]);
   useEffect(() => store.set("qraft.design", design), [design]);
   useEffect(() => store.set("qraft.size", exportSize), [exportSize]);
+
+  useEffect(() => {
+    if (!scanOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setScanOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [scanOpen]);
+
+  const scanMatrix = useMemo(() => {
+    try {
+      return makeMatrix(SCAN_URL, "M");
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const scanSvg = useMemo(
+    () =>
+      scanMatrix
+        ? renderSvg(
+            scanMatrix,
+            {
+              ...DEFAULT_DESIGN,
+              fg: "#111111",
+              fg2: "#111111",
+              gradient: false,
+              bg: "#ffffff",
+              transparent: false,
+              margin: 2,
+              logo: null,
+            },
+            480,
+          )
+        : "",
+    [scanMatrix],
+  );
 
   useEffect(() => {
     if (!design.logo) {
@@ -303,9 +348,14 @@ export default function App() {
           >
             <Icon d={theme === "dark" ? ICON.sun : ICON.moon} />
           </button>
-          <a className="btn ghost icon" href={REPO_URL} target="_blank" rel="noreferrer" aria-label="GitHub">
-            <Icon d={ICON.github} />
-          </a>
+          <button
+            className="btn ghost scan-btn"
+            onClick={() => setScanOpen(true)}
+            title={t.scanTitle}
+          >
+            <Icon d={ICON.qr} />
+            <span>{t.scan}</span>
+          </button>
         </div>
       </header>
 
@@ -572,6 +622,32 @@ export default function App() {
         <p>{t.credit}</p>
         <p className="footer-note">{t.footerNote}</p>
       </footer>
+
+      {scanOpen && (
+        <div className="scan-backdrop" onClick={() => setScanOpen(false)}>
+          <div
+            className="scan-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="scan-close"
+              aria-label={t.close}
+              onClick={() => setScanOpen(false)}
+            >
+              ×
+            </button>
+            <h3>{t.scanTitle}</h3>
+            <div className="scan-qr" dangerouslySetInnerHTML={{ __html: scanSvg }} />
+            <p>{t.scanHint}</p>
+            <code className="scan-url">{SCAN_URL}</code>
+            <a className="scan-link" href={SCAN_URL} target="_blank" rel="noreferrer">
+              {t.scanOpenHere}
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

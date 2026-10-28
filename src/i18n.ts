@@ -32,6 +32,11 @@ export const dict = {
     errorTooLong: "内容太长，当前容错等级放不下，试试降低容错等级",
     errorEmpty: "先输入一点内容",
     localOnly: "本地渲染",
+    scan: "手机扫码",
+    scanTitle: "在手机上打开 Qraft",
+    scanHint: "用手机扫码，随时随地打开这个页面",
+    scanOpenHere: "在电脑上打开",
+    close: "关闭",
     credit: "界面与交互参考自 QRBTF，本站为独立实现的静态版本",
     footerNote: "无需注册 · 不上传数据 · 可离线使用",
     styles: {
@@ -83,6 +88,11 @@ export const dict = {
     errorTooLong: "Too much data for this error correction level — try a lower level",
     errorEmpty: "Enter some content first",
     localOnly: "Rendered locally",
+    scan: "Scan",
+    scanTitle: "Open Qraft on your phone",
+    scanHint: "Scan with your phone camera to open this page",
+    scanOpenHere: "Open on this device",
+    close: "Close",
     credit: "Interface inspired by QRBTF. This is an independent static implementation.",
     footerNote: "No sign-up · No uploads · Works offline",
     styles: {
