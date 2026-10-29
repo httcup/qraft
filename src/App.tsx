@@ -13,6 +13,8 @@ import { dict, type Lang } from "./i18n";
 
 const ECC_LEVELS: Ecc[] = ["L", "M", "Q", "H"];
 const REPO_URL = "https://github.com/httcup/qraft";
+/** Initial content; behaves like placeholder text in the editor field. */
+const DEFAULT_TEXT = "https://xhxh.vip/";
 
 /** 二维码指向的地址：线上用当前页面地址，本地开发时指向正式站点。 */
 const SCAN_URL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(
@@ -142,7 +144,7 @@ export default function App() {
       : store.get<Theme>("qraft.theme", "light"),
   );
   const [text, setText] = useState(() =>
-    params.get("text") ?? store.get<string>("qraft.text", "https://xhxh.vip/"),
+    params.get("text") ?? store.get<string>("qraft.text", DEFAULT_TEXT),
   );
   const [ecc, setEcc] = useState<Ecc>(() =>
     paramEcc && ECC_LEVELS.includes(paramEcc) ? paramEcc : store.get<Ecc>("qraft.ecc", "M"),
@@ -427,6 +429,16 @@ export default function App() {
               spellCheck={false}
               placeholder={t.contentPlaceholder}
               onChange={(e) => setText(e.target.value)}
+              onFocus={() => {
+                // Treat the untouched default as placeholder text: clear it as
+                // soon as the field is focused so the user can type right away.
+                if (text === DEFAULT_TEXT) setText("");
+              }}
+              onBlur={() => {
+                // Restore the default when the field is left empty, so the
+                // preview never collapses into an error state.
+                if (text.trim() === "") setText(DEFAULT_TEXT);
+              }}
             />
             {error && <p className="field-error">{error}</p>}
             <div className="field">
